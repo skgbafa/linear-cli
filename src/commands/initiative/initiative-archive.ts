@@ -1,5 +1,5 @@
 import { Command } from "@cliffy/command"
-import { Confirm, Input } from "@cliffy/prompt"
+import { Confirm } from "@cliffy/prompt"
 import { gql } from "../../__codegen__/gql.ts"
 import { getGraphQLClient } from "../../utils/graphql.ts"
 import {
@@ -10,19 +10,19 @@ import {
   printBulkSummary,
 } from "../../utils/bulk.ts"
 
-interface InitiativeDeleteResult extends BulkOperationResult {
+interface InitiativeArchiveResult extends BulkOperationResult {
   name: string
 }
 
-export const deleteCommand = new Command()
-  .name("delete")
-  .description("Permanently delete a Linear initiative")
+export const archiveCommand = new Command()
+  .name("archive")
+  .description("Archive a Linear initiative")
   .arguments("[initiativeId:string]")
   .option("-y, --force", "Skip confirmation prompt")
   .option("--no-color", "Disable colored output")
   .option(
     "--bulk <ids...:string>",
-    "Delete multiple initiatives by ID, slug, or name",
+    "Archive multiple initiatives by ID, slug, or name",
   )
   .option(
     "--bulk-file <file:string>",
@@ -38,7 +38,7 @@ export const deleteCommand = new Command()
 
       // Check if bulk mode
       if (isBulkMode({ bulk, bulkFile, bulkStdin })) {
-        await handleBulkDelete(client, {
+        await handleBulkArchive(client, {
           bulk,
           bulkFile,
           bulkStdin,
@@ -56,11 +56,11 @@ export const deleteCommand = new Command()
         Deno.exit(1)
       }
 
-      await handleSingleDelete(client, initiativeId, { force, colorEnabled })
+      await handleSingleArchive(client, initiativeId, { force, colorEnabled })
     },
   )
 
-async function handleSingleDelete(
+async function handleSingleArchive(
   // deno-lint-ignore no-explicit-any
   client: any,
   initiativeId: string,
@@ -77,16 +77,12 @@ async function handleSingleDelete(
 
   // Get initiative details for confirmation message
   const detailsQuery = gql(`
-    query GetInitiativeForDelete($id: String!) {
+    query GetInitiativeForArchive($id: String!) {
       initiative(id: $id) {
         id
         slugId
         name
-        projects {
-          nodes {
-            id
-          }
-        }
+        archivedAt
       }
     }
   `)
@@ -105,37 +101,22 @@ async function handleSingleDelete(
   }
 
   const initiative = initiativeDetails.initiative
-  const projectCount = initiative.projects?.nodes?.length || 0
 
-  // Warn about linked projects
-  if (projectCount > 0) {
-    console.log(
-      `\n⚠️  Initiative "${initiative.name}" has ${projectCount} linked project(s).`,
-    )
-    console.log("Deleting the initiative will unlink these projects.\n")
+  // Check if already archived
+  if (initiative.archivedAt) {
+    console.log(`Initiative "${initiative.name}" is already archived.`)
+    return
   }
 
-  // Confirm deletion with typed confirmation for safety
+  // Confirm archival
   if (!force) {
-    console.log(`\n⚠️  This action is PERMANENT and cannot be undone.\n`)
-
     const confirmed = await Confirm.prompt({
-      message: `Are you sure you want to permanently delete "${initiative.name}"?`,
-      default: false,
+      message: `Archive initiative "${initiative.name}"?`,
+      default: true,
     })
 
     if (!confirmed) {
-      console.log("Delete cancelled.")
-      return
-    }
-
-    // Require typing the initiative name for extra safety
-    const typedName = await Input.prompt({
-      message: `Type the initiative name to confirm deletion:`,
-    })
-
-    if (typedName !== initiative.name) {
-      console.log("Name does not match. Delete cancelled.")
+      console.log("Archive cancelled.")
       return
     }
   }
@@ -145,34 +126,34 @@ async function handleSingleDelete(
   const spinner = showSpinner ? new Spinner() : null
   spinner?.start()
 
-  // Delete the initiative
-  const deleteMutation = gql(`
-    mutation DeleteInitiative($id: String!) {
-      initiativeDelete(id: $id) {
+  // Archive the initiative
+  const archiveMutation = gql(`
+    mutation ArchiveInitiative($id: String!) {
+      initiativeArchive(id: $id) {
         success
       }
     }
   `)
 
   try {
-    const result = await client.request(deleteMutation, { id: resolvedId })
+    const result = await client.request(archiveMutation, { id: resolvedId })
 
     spinner?.stop()
 
-    if (!result.initiativeDelete.success) {
-      console.error("Failed to delete initiative")
+    if (!result.initiativeArchive.success) {
+      console.error("Failed to archive initiative")
       Deno.exit(1)
     }
 
-    console.log(`✓ Permanently deleted initiative: ${initiative.name}`)
+    console.log(`✓ Archived initiative: ${initiative.name}`)
   } catch (error) {
     spinner?.stop()
-    console.error("Failed to delete initiative:", error)
+    console.error("Failed to archive initiative:", error)
     Deno.exit(1)
   }
 }
 
-async function handleBulkDelete(
+async function handleBulkArchive(
   // deno-lint-ignore no-explicit-any
   client: any,
   options: {
@@ -193,30 +174,29 @@ async function handleBulkDelete(
   })
 
   if (ids.length === 0) {
-    console.error("No initiative IDs provided for bulk delete.")
+    console.error("No initiative IDs provided for bulk archive.")
     Deno.exit(1)
   }
 
-  console.log(`Found ${ids.length} initiative(s) to delete.`)
-  console.log(`\n⚠️  This action is PERMANENT and cannot be undone.\n`)
+  console.log(`Found ${ids.length} initiative(s) to archive.`)
 
   // Confirm bulk operation
   if (!force) {
     const confirmed = await Confirm.prompt({
-      message: `Permanently delete ${ids.length} initiative(s)?`,
+      message: `Archive ${ids.length} initiative(s)?`,
       default: false,
     })
 
     if (!confirmed) {
-      console.log("Bulk delete cancelled.")
+      console.log("Bulk archive cancelled.")
       return
     }
   }
 
-  // Define the delete operation
-  const deleteOperation = async (
+  // Define the archive operation
+  const archiveOperation = async (
     idOrSlugOrName: string,
-  ): Promise<InitiativeDeleteResult> => {
+  ): Promise<InitiativeArchiveResult> => {
     // Resolve the ID
     const resolvedId = await resolveInitiativeId(client, idOrSlugOrName)
     if (!resolvedId) {
@@ -230,42 +210,55 @@ async function handleBulkDelete(
 
     // Get initiative name for display
     const detailsQuery = gql(`
-      query GetInitiativeNameForBulkDelete($id: String!) {
+      query GetInitiativeNameForBulkArchive($id: String!) {
         initiative(id: $id) {
           id
           name
+          archivedAt
         }
       }
     `)
 
     let name = idOrSlugOrName
+    let alreadyArchived = false
 
     try {
       const details = await client.request(detailsQuery, { id: resolvedId })
       if (details?.initiative) {
         name = details.initiative.name
+        alreadyArchived = Boolean(details.initiative.archivedAt)
       }
     } catch {
       // Continue with default name
     }
 
-    // Delete the initiative
-    const deleteMutation = gql(`
-      mutation BulkDeleteInitiative($id: String!) {
-        initiativeDelete(id: $id) {
+    // Skip if already archived
+    if (alreadyArchived) {
+      return {
+        id: resolvedId,
+        name,
+        success: true,
+        error: undefined,
+      }
+    }
+
+    // Archive the initiative
+    const archiveMutation = gql(`
+      mutation BulkArchiveInitiative($id: String!) {
+        initiativeArchive(id: $id) {
           success
         }
       }
     `)
 
-    const result = await client.request(deleteMutation, { id: resolvedId })
+    const result = await client.request(archiveMutation, { id: resolvedId })
 
-    if (!result.initiativeDelete.success) {
+    if (!result.initiativeArchive.success) {
       return {
         id: resolvedId,
         name,
         success: false,
-        error: "Delete operation failed",
+        error: "Archive operation failed",
       }
     }
 
@@ -277,7 +270,7 @@ async function handleBulkDelete(
   }
 
   // Execute bulk operation
-  const summary = await executeBulkOperations(ids, deleteOperation, {
+  const summary = await executeBulkOperations(ids, archiveOperation, {
     showProgress: true,
     colorEnabled,
   })
@@ -285,7 +278,7 @@ async function handleBulkDelete(
   // Print summary
   printBulkSummary(summary, {
     entityName: "initiative",
-    operationName: "deleted",
+    operationName: "archived",
     colorEnabled,
     showDetails: true,
   })
@@ -310,10 +303,10 @@ async function resolveInitiativeId(
     return idOrSlugOrName
   }
 
-  // Try as slug (including archived - user might want to delete archived initiative)
+  // Try as slug
   const slugQuery = gql(`
-    query GetInitiativeBySlugForDelete($slugId: String!) {
-      initiatives(filter: { slugId: { eq: $slugId } }, includeArchived: true) {
+    query GetInitiativeBySlugForArchive($slugId: String!) {
+      initiatives(filter: { slugId: { eq: $slugId } }) {
         nodes {
           id
           slugId
@@ -331,10 +324,10 @@ async function resolveInitiativeId(
     // Continue to name lookup
   }
 
-  // Try as name (including archived)
+  // Try as name
   const nameQuery = gql(`
-    query GetInitiativeByNameForDelete($name: String!) {
-      initiatives(filter: { name: { eqIgnoreCase: $name } }, includeArchived: true) {
+    query GetInitiativeByNameForArchive($name: String!) {
+      initiatives(filter: { name: { eqIgnoreCase: $name } }) {
         nodes {
           id
           name
