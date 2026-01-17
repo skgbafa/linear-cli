@@ -6,6 +6,7 @@ import { issueCommand } from "./commands/issue/issue.ts"
 import { teamCommand } from "./commands/team/team.ts"
 import { projectCommand } from "./commands/project/project.ts"
 import { milestoneCommand } from "./commands/milestone/milestone.ts"
+import { initiativeCommand } from "./commands/initiative/initiative.ts"
 import { configCommand } from "./commands/config.ts"
 import { schemaCommand } from "./commands/schema.ts"
 
@@ -28,6 +29,8 @@ await new Command()
   .alias("p")
   .command("milestone", milestoneCommand)
   .alias("m")
+  .command("initiative", initiativeCommand)
+  .alias("init")
   .command("completions", new CompletionsCommand())
   .command("config", configCommand)
   .command("schema", schemaCommand)
