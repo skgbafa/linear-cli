@@ -18,13 +18,11 @@ const CreateInitiative = gql(`
   }
 `)
 
-// Initiative statuses
+// Initiative statuses (enum values: Planned, Active, Completed)
 const INITIATIVE_STATUSES = [
-  { name: "Planned", value: "planned" },
-  { name: "Active", value: "active" },
-  { name: "Paused", value: "paused" },
-  { name: "Completed", value: "completed" },
-  { name: "Canceled", value: "canceled" },
+  { name: "Planned", value: "Planned" },
+  { name: "Active", value: "Active" },
+  { name: "Completed", value: "Completed" },
 ]
 
 // Common initiative colors from Linear's palette
@@ -48,7 +46,7 @@ export const createCommand = new Command()
   .option("-d, --description <description:string>", "Initiative description")
   .option(
     "-s, --status <status:string>",
-    "Status: planned, active, paused, completed, canceled (default: planned)",
+    "Status: planned, active, completed (default: planned)",
   )
   .option(
     "-o, --owner <owner:string>",
@@ -173,17 +171,19 @@ export const createCommand = new Command()
       Deno.exit(1)
     }
 
-    // Validate status if provided
+    // Validate status if provided (user can input lowercase, we convert to API format)
     if (status) {
       const statusLower = status.toLowerCase()
-      const validStatuses = INITIATIVE_STATUSES.map((s) => s.value)
-      if (!validStatuses.includes(statusLower)) {
+      const statusEntry = INITIATIVE_STATUSES.find(
+        (s) => s.value.toLowerCase() === statusLower
+      )
+      if (!statusEntry) {
         console.error(
-          `Invalid status: ${status}. Valid values: ${validStatuses.join(", ")}`,
+          `Invalid status: ${status}. Valid values: ${INITIATIVE_STATUSES.map((s) => s.value.toLowerCase()).join(", ")}`,
         )
         Deno.exit(1)
       }
-      status = statusLower
+      status = statusEntry.value
     }
 
     // Validate color format if provided

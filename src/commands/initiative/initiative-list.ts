@@ -7,8 +7,8 @@ import { padDisplay, truncateText } from "../../utils/display.ts"
 import { getOption } from "../../config.ts"
 
 const GetInitiatives = gql(`
-  query GetInitiatives($filter: InitiativeFilter) {
-    initiatives(filter: $filter) {
+  query GetInitiatives($filter: InitiativeFilter, $includeArchived: Boolean) {
+    initiatives(filter: $filter, includeArchived: $includeArchived) {
       nodes {
         id
         slugId
@@ -41,20 +41,24 @@ const GetInitiatives = gql(`
 `)
 
 // Initiative status display names and order
+// Note: InitiativeStatus enum values are: Planned, Active, Completed
 const INITIATIVE_STATUS_ORDER: Record<string, number> = {
-  "active": 1,
-  "planned": 2,
-  "paused": 3,
-  "completed": 4,
-  "canceled": 5,
+  "Active": 1,
+  "Planned": 2,
+  "Completed": 3,
 }
 
 const INITIATIVE_STATUS_DISPLAY: Record<string, string> = {
+  "Active": "Active",
+  "Planned": "Planned",
+  "Completed": "Completed",
+}
+
+// Map user input (lowercase) to API values (capitalized)
+const STATUS_INPUT_MAP: Record<string, string> = {
   "active": "Active",
   "planned": "Planned",
-  "paused": "Paused",
   "completed": "Completed",
-  "canceled": "Canceled",
 }
 
 export const listCommand = new Command()
@@ -62,7 +66,7 @@ export const listCommand = new Command()
   .description("List initiatives")
   .option(
     "-s, --status <status:string>",
-    "Filter by status (active, planned, paused, completed, canceled)",
+    "Filter by status (active, planned, completed)",
   )
   .option("--all-statuses", "Show all statuses (default: active only)")
   .option("-o, --owner <owner:string>", "Filter by owner (username or email)")
@@ -110,18 +114,18 @@ export const listCommand = new Command()
       // Status filter
       if (status) {
         const statusLower = status.toLowerCase()
-        const validStatuses = Object.keys(INITIATIVE_STATUS_ORDER)
-        if (!validStatuses.includes(statusLower)) {
+        const apiStatus = STATUS_INPUT_MAP[statusLower]
+        if (!apiStatus) {
           spinner?.stop()
           console.error(
-            `Invalid status: ${status}. Valid values: ${validStatuses.join(", ")}`,
+            `Invalid status: ${status}. Valid values: ${Object.keys(STATUS_INPUT_MAP).join(", ")}`,
           )
           Deno.exit(1)
         }
-        filter.status = { eq: statusLower }
+        filter.status = { eq: apiStatus }
       } else if (!allStatuses) {
         // Default to active only
-        filter.status = { eq: "active" }
+        filter.status = { eq: "Active" }
       }
 
       // Owner filter
@@ -136,14 +140,10 @@ export const listCommand = new Command()
         filter.owner = { id: { eq: ownerId } }
       }
 
-      // Archived filter
-      if (!archived) {
-        filter.archivedAt = { null: true }
-      }
-
       const client = getGraphQLClient()
       const result = await client.request(GetInitiatives, {
         filter: Object.keys(filter).length > 0 ? filter : undefined,
+        includeArchived: archived || false,
       })
       spinner?.stop()
 
@@ -284,11 +284,9 @@ export const listCommand = new Command()
 
         // Get status color
         const statusColors: Record<string, string> = {
-          active: "#27AE60",
-          planned: "#5E6AD2",
-          paused: "#F2994A",
-          completed: "#6B6F76",
-          canceled: "#EB5757",
+          Active: "#27AE60",
+          Planned: "#5E6AD2",
+          Completed: "#6B6F76",
         }
         const statusColor = statusColors[init.status] || "#6B6F76"
 
