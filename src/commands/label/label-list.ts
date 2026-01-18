@@ -130,6 +130,7 @@ export const listCommand = new Command()
         ? Deno.consoleSize()
         : { columns: 120 }
 
+      const ID_WIDTH = 36 // UUID length
       const COLOR_WIDTH = 7 // "#XXXXXX"
       const TEAM_WIDTH = Math.min(
         15,
@@ -141,8 +142,8 @@ export const listCommand = new Command()
         ),
       )
 
-      const SPACE_WIDTH = 4
-      const fixed = COLOR_WIDTH + TEAM_WIDTH + SPACE_WIDTH
+      const SPACE_WIDTH = 6
+      const fixed = ID_WIDTH + COLOR_WIDTH + TEAM_WIDTH + SPACE_WIDTH
       const PADDING = 1
       const maxNameWidth = Math.max(
         ...sortedLabels.map((l) => unicodeWidth(l.name)),
@@ -152,6 +153,7 @@ export const listCommand = new Command()
 
       // Print header
       const headerCells = [
+        padDisplay("ID", ID_WIDTH),
         padDisplay("NAME", nameWidth),
         padDisplay("COLOR", COLOR_WIDTH),
         padDisplay("TEAM", TEAM_WIDTH),
@@ -178,10 +180,11 @@ export const listCommand = new Command()
           ? label.name.slice(0, nameWidth - 3) + "..."
           : padDisplay(label.name, nameWidth)
 
+        const idDisplay = padDisplay(label.id, ID_WIDTH)
         const colorDisplay = padDisplay(label.color, COLOR_WIDTH)
         const teamCol = padDisplay(teamDisplay, TEAM_WIDTH)
 
-        console.log(`${truncName} ${colorDisplay} ${teamCol}`)
+        console.log(`${idDisplay} ${truncName} ${colorDisplay} ${teamCol}`)
       }
 
       console.log(`\n${sortedLabels.length} labels found.`)

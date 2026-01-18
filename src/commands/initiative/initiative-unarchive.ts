@@ -19,14 +19,16 @@ export const unarchiveCommand = new Command()
       Deno.exit(1)
     }
 
-    // Get initiative details for confirmation message
+    // Get initiative details for confirmation message (must include archived)
     const detailsQuery = gql(`
-      query GetInitiativeForUnarchive($id: String!) {
-        initiative(id: $id) {
-          id
-          slugId
-          name
-          archivedAt
+      query GetInitiativeForUnarchive($id: ID!) {
+        initiatives(filter: { id: { eq: $id } }, includeArchived: true) {
+          nodes {
+            id
+            slugId
+            name
+            archivedAt
+          }
         }
       }
     `)
@@ -39,12 +41,12 @@ export const unarchiveCommand = new Command()
       Deno.exit(1)
     }
 
-    if (!initiativeDetails?.initiative) {
+    if (!initiativeDetails?.initiatives?.nodes?.length) {
       console.error(`Initiative not found: ${initiativeId}`)
       Deno.exit(1)
     }
 
-    const initiative = initiativeDetails.initiative
+    const initiative = initiativeDetails.initiatives.nodes[0]
 
     // Check if already unarchived
     if (!initiative.archivedAt) {

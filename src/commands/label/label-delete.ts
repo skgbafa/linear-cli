@@ -76,8 +76,14 @@ async function resolveLabelId(
   }
 
   // Try as name
-  const result = await client.request(GetLabelByName, { name: nameOrId })
-  const labels = (result.issueLabels?.nodes || []) as Label[]
+  let labels: Label[] = []
+  try {
+    const result = await client.request(GetLabelByName, { name: nameOrId })
+    labels = (result.issueLabels?.nodes || []) as Label[]
+  } catch {
+    // Query failed, label not found
+    return undefined
+  }
 
   if (labels.length === 0) {
     return undefined
