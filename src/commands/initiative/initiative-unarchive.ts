@@ -75,7 +75,7 @@ export const unarchiveCommand = new Command()
       mutation UnarchiveInitiative($id: String!) {
         initiativeUnarchive(id: $id) {
           success
-          initiative {
+          entity {
             id
             slugId
             name
@@ -95,9 +95,9 @@ export const unarchiveCommand = new Command()
         Deno.exit(1)
       }
 
-      const unarchived = result.initiativeUnarchive.initiative
-      console.log(`✓ Unarchived initiative: ${unarchived.name}`)
-      if (unarchived.url) {
+      const unarchived = result.initiativeUnarchive.entity
+      console.log(`✓ Unarchived initiative: ${unarchived?.name}`)
+      if (unarchived?.url) {
         console.log(unarchived.url)
       }
     } catch (error) {

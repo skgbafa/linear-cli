@@ -51,7 +51,7 @@ export const updateCommand = new Command()
 
       // Get current initiative details
       const detailsQuery = gql(`
-        query GetInitiativeDetails($id: String!) {
+        query GetInitiativeForUpdate($id: String!) {
           initiative(id: $id) {
             id
             slugId

@@ -3,16 +3,17 @@ import { Confirm } from "@cliffy/prompt"
 import { gql } from "../../__codegen__/gql.ts"
 import { getGraphQLClient } from "../../utils/graphql.ts"
 
-const GetInitiativeToProject = gql(`
-  query GetInitiativeToProject($initiativeId: String!, $projectId: String!) {
-    initiativeToProjects(
-      filter: {
-        initiative: { id: { eq: $initiativeId } }
-        project: { id: { eq: $projectId } }
-      }
-    ) {
+const GetInitiativeToProjects = gql(`
+  query GetInitiativeToProjects($first: Int) {
+    initiativeToProjects(first: $first) {
       nodes {
         id
+        initiative {
+          id
+        }
+        project {
+          id
+        }
       }
     }
   }
@@ -216,13 +217,18 @@ export const removeProjectCommand = new Command()
       let linkId: string | undefined
 
       try {
-        const linkResult = await client.request(GetInitiativeToProject, {
-          initiativeId: initiative.id,
-          projectId: project.id,
+        const linkResult = await client.request(GetInitiativeToProjects, {
+          first: 250,
         })
 
-        if (linkResult.initiativeToProjects?.nodes?.length > 0) {
-          linkId = linkResult.initiativeToProjects.nodes[0].id
+        // Filter client-side for the matching link
+        const link = linkResult.initiativeToProjects?.nodes?.find(
+          (node) =>
+            node.initiative?.id === initiative.id &&
+            node.project?.id === project.id
+        )
+        if (link) {
+          linkId = link.id
         }
       } catch (error) {
         console.error("Failed to find project link:", error)
