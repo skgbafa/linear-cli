@@ -1,5 +1,7 @@
 import { Command } from "@cliffy/command"
 
+import { listCommand } from "./initiative-list.ts"
+import { viewCommand } from "./initiative-view.ts"
 import { createCommand } from "./initiative-create.ts"
 import { archiveCommand } from "./initiative-archive.ts"
 import { updateCommand } from "./initiative-update.ts"
@@ -8,13 +10,14 @@ import { deleteCommand } from "./initiative-delete.ts"
 import { addProjectCommand } from "./initiative-add-project.ts"
 import { removeProjectCommand } from "./initiative-remove-project.ts"
 
-// Note: list, view commands will be added by TC-516
-
 export const initiativeCommand = new Command()
   .description("Manage Linear initiatives")
   .action(function () {
     this.showHelp()
   })
+  .command("list", listCommand)
+  .alias("ls")
+  .command("view", viewCommand)
   .command("create", createCommand)
   .command("archive", archiveCommand)
   .command("update", updateCommand)
