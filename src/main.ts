@@ -5,8 +5,10 @@ import { authCommand } from "./commands/auth/auth.ts"
 import { issueCommand } from "./commands/issue/issue.ts"
 import { teamCommand } from "./commands/team/team.ts"
 import { projectCommand } from "./commands/project/project.ts"
+import { projectUpdateCommand } from "./commands/project-update/project-update.ts"
 import { milestoneCommand } from "./commands/milestone/milestone.ts"
 import { initiativeCommand } from "./commands/initiative/initiative.ts"
+import { initiativeUpdateCommand } from "./commands/initiative-update/initiative-update.ts"
 import { labelCommand } from "./commands/label/label.ts"
 import { documentCommand } from "./commands/document/document.ts"
 import { configCommand } from "./commands/config.ts"
@@ -29,10 +31,14 @@ await new Command()
   .alias("t")
   .command("project", projectCommand)
   .alias("p")
+  .command("project-update", projectUpdateCommand)
+  .alias("pu")
   .command("milestone", milestoneCommand)
   .alias("m")
   .command("initiative", initiativeCommand)
   .alias("init")
+  .command("initiative-update", initiativeUpdateCommand)
+  .alias("iu")
   .command("label", labelCommand)
   .alias("l")
   .command("document", documentCommand)
