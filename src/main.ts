@@ -8,6 +8,7 @@ import { projectCommand } from "./commands/project/project.ts"
 import { milestoneCommand } from "./commands/milestone/milestone.ts"
 import { initiativeCommand } from "./commands/initiative/initiative.ts"
 import { labelCommand } from "./commands/label/label.ts"
+import { documentCommand } from "./commands/document/document.ts"
 import { configCommand } from "./commands/config.ts"
 import { schemaCommand } from "./commands/schema.ts"
 
@@ -34,6 +35,9 @@ await new Command()
   .alias("init")
   .command("label", labelCommand)
   .alias("l")
+  .command("document", documentCommand)
+  .alias("doc")
+  .alias("docs")
   .command("completions", new CompletionsCommand())
   .command("config", configCommand)
   .command("schema", schemaCommand)
