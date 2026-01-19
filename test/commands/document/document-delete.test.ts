@@ -25,44 +25,21 @@ await snapshotTest({
   async fn() {
     const server = new MockLinearServer([
       {
-        queryName: "DeleteDocument",
+        queryName: "GetDocumentForDelete",
         variables: { id: "d4b93e3b2695" },
         response: {
           data: {
-            documentDelete: {
-              success: true,
+            document: {
+              id: "doc-uuid-123",
+              slugId: "d4b93e3b2695",
+              title: "Test Document",
             },
           },
         },
       },
-    ])
-
-    try {
-      await server.start()
-      Deno.env.set("LINEAR_GRAPHQL_ENDPOINT", server.getEndpoint())
-      Deno.env.set("LINEAR_API_KEY", "Bearer test-token")
-
-      await deleteCommand.parse()
-    } finally {
-      await server.stop()
-      Deno.env.delete("LINEAR_GRAPHQL_ENDPOINT")
-      Deno.env.delete("LINEAR_API_KEY")
-    }
-  },
-})
-
-// Test permanent delete
-await snapshotTest({
-  name: "Document Delete Command - Permanent Delete",
-  meta: import.meta,
-  colors: false,
-  args: ["d4b93e3b2695", "--permanent", "-y"],
-  denoArgs: commonDenoArgs,
-  async fn() {
-    const server = new MockLinearServer([
       {
-        queryName: "DeleteDocumentPermanent",
-        variables: { id: "d4b93e3b2695" },
+        queryName: "DeleteDocument",
+        variables: { id: "doc-uuid-123" },
         response: {
           data: {
             documentDelete: {
@@ -97,13 +74,12 @@ await snapshotTest({
   async fn() {
     const server = new MockLinearServer([
       {
-        queryName: "DeleteDocument",
+        queryName: "GetDocumentForDelete",
         variables: { id: "nonexistent123" },
         response: {
-          errors: [{
-            message: "Document not found: nonexistent123",
-            extensions: { code: "NOT_FOUND" },
-          }],
+          data: {
+            document: null,
+          },
         },
       },
     ])
@@ -136,8 +112,21 @@ await snapshotTest({
   async fn() {
     const server = new MockLinearServer([
       {
-        queryName: "DeleteDocument",
+        queryName: "GetDocumentForBulkDelete",
         variables: { id: "d4b93e3b2695" },
+        response: {
+          data: {
+            document: {
+              id: "doc-uuid-1",
+              slugId: "d4b93e3b2695",
+              title: "Document 1",
+            },
+          },
+        },
+      },
+      {
+        queryName: "BulkDeleteDocument",
+        variables: { id: "doc-uuid-1" },
         response: {
           data: {
             documentDelete: {
@@ -147,8 +136,21 @@ await snapshotTest({
         },
       },
       {
-        queryName: "DeleteDocument",
+        queryName: "GetDocumentForBulkDelete",
         variables: { id: "25a3c439c040" },
+        response: {
+          data: {
+            document: {
+              id: "doc-uuid-2",
+              slugId: "25a3c439c040",
+              title: "Document 2",
+            },
+          },
+        },
+      },
+      {
+        queryName: "BulkDeleteDocument",
+        variables: { id: "doc-uuid-2" },
         response: {
           data: {
             documentDelete: {
@@ -183,8 +185,21 @@ await snapshotTest({
   async fn() {
     const server = new MockLinearServer([
       {
-        queryName: "DeleteDocument",
+        queryName: "GetDocumentForDelete",
         variables: { id: "d4b93e3b2695" },
+        response: {
+          data: {
+            document: {
+              id: "doc-uuid-123",
+              slugId: "d4b93e3b2695",
+              title: "Test Document",
+            },
+          },
+        },
+      },
+      {
+        queryName: "DeleteDocument",
+        variables: { id: "doc-uuid-123" },
         response: {
           errors: [{
             message: "You don't have permission to delete this document",

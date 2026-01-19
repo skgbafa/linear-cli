@@ -40,7 +40,8 @@ await snapshotTest({
                 id: "doc-new",
                 slugId: "newd0c12345",
                 title: "Test Document",
-                url: "https://linear.app/test/document/test-document-newd0c12345",
+                url:
+                  "https://linear.app/test/document/test-document-newd0c12345",
               },
             },
           },
@@ -67,7 +68,14 @@ await snapshotTest({
   name: "Document Create Command - Attached To Project",
   meta: import.meta,
   colors: false,
-  args: ["--title", "Project Spec", "--project", "tinycloud-sdk", "--content", "# Spec"],
+  args: [
+    "--title",
+    "Project Spec",
+    "--project",
+    "tinycloud-sdk",
+    "--content",
+    "# Spec",
+  ],
   denoArgs: commonDenoArgs,
   async fn() {
     const server = new MockLinearServer([
@@ -115,7 +123,14 @@ await snapshotTest({
   name: "Document Create Command - Attached To Issue",
   meta: import.meta,
   colors: false,
-  args: ["--title", "Investigation", "--issue", "TC-123", "--content", "# Notes"],
+  args: [
+    "--title",
+    "Investigation",
+    "--issue",
+    "TC-123",
+    "--content",
+    "# Notes",
+  ],
   denoArgs: commonDenoArgs,
   async fn() {
     const server = new MockLinearServer([
@@ -136,7 +151,8 @@ await snapshotTest({
                 id: "doc-issue",
                 slugId: "issued0c789",
                 title: "Investigation",
-                url: "https://linear.app/test/document/investigation-issued0c789",
+                url:
+                  "https://linear.app/test/document/investigation-issued0c789",
               },
             },
           },

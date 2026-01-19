@@ -35,7 +35,8 @@ await snapshotTest({
                   id: "doc-1",
                   title: "Delegation System Spec",
                   slugId: "d4b93e3b2695",
-                  url: "https://linear.app/test/document/delegation-system-spec-d4b93e3b2695",
+                  url:
+                    "https://linear.app/test/document/delegation-system-spec-d4b93e3b2695",
                   updatedAt: "2026-01-18T10:30:00Z",
                   project: { name: "TinyCloud SDK", slugId: "tinycloud-sdk" },
                   issue: null,
@@ -45,7 +46,8 @@ await snapshotTest({
                   id: "doc-2",
                   title: "Refresh Token Design Doc",
                   slugId: "25a3c439c040",
-                  url: "https://linear.app/test/document/refresh-token-design-doc-25a3c439c040",
+                  url:
+                    "https://linear.app/test/document/refresh-token-design-doc-25a3c439c040",
                   updatedAt: "2026-01-17T14:00:00Z",
                   project: null,
                   issue: null,
@@ -84,7 +86,10 @@ await snapshotTest({
     const server = new MockLinearServer([
       {
         queryName: "ListDocuments",
-        variables: { first: 50, filter: { project: { slugId: { eq: "tinycloud-sdk" } } } },
+        variables: {
+          first: 50,
+          filter: { project: { slugId: { eq: "tinycloud-sdk" } } },
+        },
         response: {
           data: {
             documents: {
@@ -93,7 +98,8 @@ await snapshotTest({
                   id: "doc-1",
                   title: "Delegation System Spec",
                   slugId: "d4b93e3b2695",
-                  url: "https://linear.app/test/document/delegation-system-spec-d4b93e3b2695",
+                  url:
+                    "https://linear.app/test/document/delegation-system-spec-d4b93e3b2695",
                   updatedAt: "2026-01-18T10:30:00Z",
                   project: { name: "TinyCloud SDK", slugId: "tinycloud-sdk" },
                   issue: null,
@@ -132,7 +138,10 @@ await snapshotTest({
     const server = new MockLinearServer([
       {
         queryName: "ListDocuments",
-        variables: { first: 50, filter: { issue: { identifier: { eq: "TC-123" } } } },
+        variables: {
+          first: 50,
+          filter: { issue: { identifier: { eq: "TC-123" } } },
+        },
         response: {
           data: {
             documents: {
@@ -141,7 +150,8 @@ await snapshotTest({
                   id: "doc-3",
                   title: "Investigation Notes",
                   slugId: "abc123def456",
-                  url: "https://linear.app/test/document/investigation-notes-abc123def456",
+                  url:
+                    "https://linear.app/test/document/investigation-notes-abc123def456",
                   updatedAt: "2026-01-16T09:00:00Z",
                   project: null,
                   issue: { identifier: "TC-123", title: "Fix login bug" },
@@ -189,7 +199,8 @@ await snapshotTest({
                   id: "doc-1",
                   title: "Delegation System Spec",
                   slugId: "d4b93e3b2695",
-                  url: "https://linear.app/test/document/delegation-system-spec-d4b93e3b2695",
+                  url:
+                    "https://linear.app/test/document/delegation-system-spec-d4b93e3b2695",
                   updatedAt: "2026-01-18T10:30:00Z",
                   project: { name: "TinyCloud SDK", slugId: "tinycloud-sdk" },
                   issue: null,

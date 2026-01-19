@@ -33,8 +33,10 @@ await snapshotTest({
               id: "doc-1",
               title: "Delegation System Spec",
               slugId: "d4b93e3b2695",
-              content: "# Delegation System\n\nThis document describes the delegation system architecture.\n\n## Overview\n\nThe system supports user-to-user delegations with time-bounded capabilities.\n\n## Implementation\n\n- UCAN-based delegation chains\n- PKH DID format for user identity\n- Session key DIDs for signing",
-              url: "https://linear.app/test/document/delegation-system-spec-d4b93e3b2695",
+              content:
+                "# Delegation System\n\nThis document describes the delegation system architecture.\n\n## Overview\n\nThe system supports user-to-user delegations with time-bounded capabilities.\n\n## Implementation\n\n- UCAN-based delegation chains\n- PKH DID format for user identity\n- Session key DIDs for signing",
+              url:
+                "https://linear.app/test/document/delegation-system-spec-d4b93e3b2695",
               createdAt: "2026-01-15T08:00:00Z",
               updatedAt: "2026-01-18T10:30:00Z",
               creator: { name: "John Doe", email: "john@example.com" },
@@ -78,8 +80,10 @@ await snapshotTest({
               id: "doc-1",
               title: "Delegation System Spec",
               slugId: "d4b93e3b2695",
-              content: "# Delegation System\n\nThis document describes the delegation system architecture.",
-              url: "https://linear.app/test/document/delegation-system-spec-d4b93e3b2695",
+              content:
+                "# Delegation System\n\nThis document describes the delegation system architecture.",
+              url:
+                "https://linear.app/test/document/delegation-system-spec-d4b93e3b2695",
               createdAt: "2026-01-15T08:00:00Z",
               updatedAt: "2026-01-18T10:30:00Z",
               creator: { name: "John Doe", email: "john@example.com" },
@@ -123,8 +127,10 @@ await snapshotTest({
               id: "doc-1",
               title: "Delegation System Spec",
               slugId: "d4b93e3b2695",
-              content: "# Delegation System\n\nThis document describes the delegation system architecture.",
-              url: "https://linear.app/test/document/delegation-system-spec-d4b93e3b2695",
+              content:
+                "# Delegation System\n\nThis document describes the delegation system architecture.",
+              url:
+                "https://linear.app/test/document/delegation-system-spec-d4b93e3b2695",
               createdAt: "2026-01-15T08:00:00Z",
               updatedAt: "2026-01-18T10:30:00Z",
               creator: { name: "John Doe", email: "john@example.com" },
@@ -207,8 +213,10 @@ await snapshotTest({
               id: "doc-3",
               title: "Investigation Notes",
               slugId: "abc123def456",
-              content: "# Investigation Notes\n\nNotes from investigating TC-123.",
-              url: "https://linear.app/test/document/investigation-notes-abc123def456",
+              content:
+                "# Investigation Notes\n\nNotes from investigating TC-123.",
+              url:
+                "https://linear.app/test/document/investigation-notes-abc123def456",
               createdAt: "2026-01-16T08:00:00Z",
               updatedAt: "2026-01-16T09:00:00Z",
               creator: { name: "Alice Dev", email: "alice@example.com" },
