@@ -1,0 +1,42 @@
+export const snapshot = {};
+
+snapshot[`Document Delete Command - Help Text 1`] = `
+stdout:
+"
+Usage: delete [documentId]
+
+Description:
+
+  Delete a document (moves to trash)
+
+Options:
+
+  -h, --help              - Show this help.                                     
+  -y, --yes               - Skip confirmation prompt                            
+  --no-color              - Disable colored output                              
+  --bulk        <ids...>  - Delete multiple documents by slug or ID             
+  --bulk-file   <file>    - Read document slugs/IDs from a file (one per line)  
+  --bulk-stdin            - Read document slugs/IDs from stdin                  
+
+"
+stderr:
+""
+`;
+
+snapshot[`Document Delete Command - Soft Delete 1`] = `
+stdout:
+"✓ Deleted document: Test Document
+"
+stderr:
+""
+`;
+
+snapshot[`Document Delete Command - Bulk Delete 1`] = `
+stdout:
+"Found 2 document(s) to delete.
+
+✓ Successfully deleted 2 documents
+"
+stderr:
+""
+`;
